@@ -1,11 +1,16 @@
 document.addEventListener("DOMContentLoaded", () => {
   console.log('popjs file');
   
+
+  
+
   chrome.runtime.sendMessage({ action: "getAvailableBusinessObjects" }, (response) => {
     console.log("available quotes:", response);
     const businessObjects = response.data;
     populateDropdown(businessObjects);
   });
+
+
 
   // Populate the dropdown with fetched data
   function populateDropdown(businessObjects) {
@@ -16,7 +21,46 @@ document.addEventListener("DOMContentLoaded", () => {
       option.text = business.business_name;
       dropdown.appendChild(option);
     });
+
+    chrome.storage.local.get('formDatatobeFilled', (result) => {
+      if (chrome.runtime.lastError) {
+        console.error('Error retrieving stored data:', chrome.runtime.lastError);
+      } else {
+        const storedFormData = result.formDatatobeFilled;
+        console.log(storedFormData);
+    
+        if (storedFormData) {
+          const targetObject = storedFormData.find(item => item.field_name === 'quote_id' || item.field_name === 'regBusinessName');
+    
+          if (targetObject) {
+            const quoteId = targetObject.field_value;
+            const selectedBusiness = targetObject.field_value;
+            console.log('dropdown value set to');
+            console.log(quoteId, selectedBusiness);
+    
+            // Find the option element with the matching value
+            const optionElement = document.getElementById('businessDropdown').querySelector(`option[value="${quoteId}"]`);
+    
+            if (optionElement) {
+              // Set the selected attribute of the option element
+              optionElement.selected = true;
+            } else {
+              console.error('Option with quoteId not found.');
+            }
+          } else {
+            console.log('No matching object found for quote_id or regBusinessName.');
+          }
+        } else {
+          console.log('No stored form data found.');
+        }
+      }
+    });
+  
+     
   }
+
+  
+  
 
   // Handle user selection
   const dropdown = document.getElementById("businessDropdown");
@@ -27,12 +71,25 @@ document.addEventListener("DOMContentLoaded", () => {
       chrome.runtime.sendMessage({action:"getQuoteByID", data:selectedQuoteId},(response =>{
         console.log('quote fecthed',response);
         quoteObject = response.data;
-        localStorage.setItem('formData', JSON.stringify(quoteObject))
+        quoteObject['quote_id'] = selectedQuoteId;
+        quoteObject['quote_name'] = dropdown.options[dropdown.selectedIndex].text;
+        console.log('quoteObject', quoteObject);
+        
+        chrome.storage.local.set({'formDatatobeFilled': quoteObject}, () => {
+          console.log('quoteObject saved to Chrome local storage');
+        });
         fillFormData(quoteObject);
       }))
      
     });
   }
+
+  // Clear local storage when the clear button is clicked
+document.getElementById('clearButton').addEventListener('click', () => {
+  chrome.storage.local.remove('formDatatobeFilled', () => {
+    console.log('formData removed from Chrome local storage');
+  });
+});
 
  // Function to simulate typing into an input element
 // Function to simulate typing into an input element
@@ -95,6 +152,7 @@ if (copyButton) {
     }
   });
  }
+
 
  // Function to handle DOM changes
 function handleDomChange() {

@@ -13,14 +13,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 	  let formData = request.data;
     let quote_id = formData.quote_id;
     let upsertData = Object.keys(formData).map(key => {
-      if (key !== 'quote_id') {
-        return {
-          quote_id: quote_id,
-          field_name: key,
-          field_value: formData[key],
-          created_at: new Date().toISOString()
-        };
-      }
+      return {
+        quote_id: quote_id,
+        field_name: key,
+        field_value: formData[key],
+        created_at: new Date().toISOString()
+      };
     }).filter(item => item !== undefined); // Filter out undefined values
 
     console.log('data to be inserted',upsertData);
@@ -107,6 +105,37 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         console.log('error while fecthing quote_id',quote_id); 
       })
    }
+   else if(request.action === 'deleteQuoteByID'){
+      console.log('deleting quote_id', request.data);
+      const quote_id = request.data;
+      supabase
+      .from('form_data')
+      .delete()
+      .eq('quote_id', quote_id)
+      .then(response => {
+        console.log('quote_id deleted', quote_id);
+        sendResponse({ status: 'success', data: response.data });
+      })
+      .catch(error => {
+        console.log('error while deleting quote_id', quote_id);
+      });
+   }
+
+   else if(request.action === 'getFormRules'){
+    console.log('fetching form rules for carrier', request.data);
+    const carrier_name = request.data;
+    supabase
+    .from('form_rules')
+    .select('input_id, standardized_field_name')
+    .eq('carrier_name', carrier_name)
+    .then(response => {
+      console.log('form rules fetched for carrier', carrier_name);
+      sendResponse({ status: 'success', data: response.data });
+    })
+    .catch(error => {
+      console.log('error while fetching form rules for carrier', carrier_name);
+    });
+  }
   return true;
 });
 

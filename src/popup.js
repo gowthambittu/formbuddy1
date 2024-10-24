@@ -30,13 +30,12 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log(storedFormData);
     
         if (storedFormData) {
-          const targetObject = storedFormData.find(item => item.field_name === 'quote_id' || item.field_name === 'regBusinessName');
+          const targetObject = storedFormData.find(item => item.field_name === 'quote_id');
     
           if (targetObject) {
             const quoteId = targetObject.field_value;
-            const selectedBusiness = targetObject.field_value;
             console.log('dropdown value set to');
-            console.log(quoteId, selectedBusiness);
+            console.log(quoteId);
     
             // Find the option element with the matching value
             const optionElement = document.getElementById('businessDropdown').querySelector(`option[value="${quoteId}"]`);
@@ -71,10 +70,6 @@ document.addEventListener("DOMContentLoaded", () => {
       chrome.runtime.sendMessage({action:"getQuoteByID", data:selectedQuoteId},(response =>{
         console.log('quote fecthed',response);
         quoteObject = response.data;
-        quoteObject['quote_id'] = selectedQuoteId;
-        quoteObject['quote_name'] = dropdown.options[dropdown.selectedIndex].text;
-        console.log('quoteObject', quoteObject);
-        
         chrome.storage.local.set({'formDatatobeFilled': quoteObject}, () => {
           console.log('quoteObject saved to Chrome local storage');
         });
@@ -154,23 +149,7 @@ if (copyButton) {
  }
 
 
- // Function to handle DOM changes
-function handleDomChange() {
-  console.log('inside ddom handle change func');
-  
-  const storedFormData = localStorage.getItem('formData');
-  if (storedFormData) {
-    const formData = JSON.parse(storedFormData);
-    fillFormData(formData);
-  }
-}
 
-// Use MutationObserver to detect changes in the DOM
-const observer = new MutationObserver(handleDomChange);
-observer.observe(document.body, { childList: true, subtree: true });
-
-// Initial check for existing form data in local storage when the page loads
-document.addEventListener("DOMContentLoaded", handleDomChange);
 
 
 });

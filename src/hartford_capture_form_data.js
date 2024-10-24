@@ -22,7 +22,6 @@ if (window.location.href.includes('thehartford.com')) {
         } else {
           // Retrieve stored formDataKey
           const storedData = await chrome.storage.local.get('formDataKey');
-
           formDataKey = storedData?.formDataKey;
         }
 
@@ -71,13 +70,44 @@ if (window.location.href.includes('thehartford.com')) {
           }
           formData['quote_id'] = quoteId;
       }
-        console.log(`saved ${JSON.stringify(formData)} from content js captureFormData func`);
+        // console.log(`saved ${JSON.stringify(formData)} from content js captureFormData func`);
 
-        // Store updated formData in Chrome storage with the key
-        await chrome.storage.local.set({ [formDataKey]: formData });
-        chrome.runtime.sendMessage({ action: "saveFormData", data: formData }, response => {
-          console.log('Data saved:', response);
-        });
+        // // Store updated formData in Chrome storage with the key
+        // await chrome.storage.local.set({ [formDataKey]: formData });
+        // chrome.runtime.sendMessage({ action: "saveFormData", data: formData }, response => {
+        //   console.log('Data saved:', response);
+        // });
+
+        chrome.runtime.sendMessage({ action: "getFormRules", data: "hartford" }, async response => {
+            if (response.status === 'success') {
+              const formRules = response.data;
+      
+              // Transform mergedData keys based on formRules
+              const transformedData = {};
+              for (const key in formData) {
+                const rule = formRules.find(rule => rule.input_id === key);
+                if (rule) {
+                  transformedData[rule.standardized_field_name] = formData[key];
+                } else {
+                  transformedData[key] = formData[key]; // Keep the original key if no rule is found
+                }
+              }
+      
+              console.log(`Hartford Transformed data: ${JSON.stringify(transformedData)}`);
+      
+              // Save transformed data to chrome storage
+              await chrome.storage.local.set({ [formDataKey]: transformedData });
+              // await chrome.storage.local.set({ ['formDataKey']: transformedData });
+              chrome.runtime.sendMessage({ action: "saveFormData", data: transformedData }, response => {
+                console.log('Data saved:', response);
+              });
+            } else {
+              console.error('Error fetching form rules:', response);
+            }
+          });
+
+
+
       } catch (error) {
         console.error('Error capturing form data:', error);
         // Handle error, e.g., display a user-friendly message, retry, etc.

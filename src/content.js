@@ -3,6 +3,7 @@
 import './hartford_capture_form_data'
 
 import './hartford_fill_form_data'
+import './chubb_capture_form_data'
 
 console.log('content js loaded');
 

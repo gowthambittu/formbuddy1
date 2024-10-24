@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "../.."
+		},
+		{
+			"path": "../../../sce-properties/iip-cifa-imei-lookup"
+		},
+		{
+			"path": "../../../sce-properties/mis-unsellable-batch"
+		},
+		{
+			"path": "../../../sce-properties/iip-onhand"
+		}
+	],
+	"settings": {}
+}

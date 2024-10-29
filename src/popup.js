@@ -59,7 +59,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   
-  
 
   // Handle user selection
   const dropdown = document.getElementById("businessDropdown");

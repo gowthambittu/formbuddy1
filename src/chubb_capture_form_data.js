@@ -52,6 +52,9 @@ if (window.location.href.includes('https://www.chubbsmallbusiness.com') || windo
             formData['quote_id'] = quote_id;
           }
         }
+        let temp_data = await chrome.storage.local.get('temp_data') || {};
+        temp_data = temp_data['temp_data'] || {};
+        // const mergedData = { ...temp_data, ...formData }; // Use a different variable name
         let regBusinessNameInput;
         const regBusinessNameElements = document.getElementsByName('qid_1');
         if (regBusinessNameElements.length > 0) {
@@ -78,10 +81,54 @@ if (window.location.href.includes('https://www.chubbsmallbusiness.com') || windo
               // Delete the previous quote_id
               chrome.runtime.sendMessage({ action: "deleteQuoteByID", data: current_quote_id }, deleteResponse => {
                 console.log('previous quote_id deleted', current_quote_id);
+                formData['quote_id'] = data[0].quote_id;
+                console.log('setting existing quote id', formData['quote_id']);
+                inputs.forEach(input => {
+                  // const formDataValue = {
+                  //   value: input.value, // Existing value storage
+                  //   type: input.type
+                  // };
+                  const formDataValue = input.value;
+          
+                  if (input.type === 'radio') {
+                    if (input.checked) {
+                      formData[input.name] = formDataValue;
+                    }
+                  } else {
+                    formData[input.name] = formDataValue;
+                  }
+                });
+                          
+                chrome.runtime.sendMessage({ action: "getFormRules", data: "chubb" }, async response => {
+                  if (response.status === 'success') {
+                    const formRules = response.data;
+                    const mergedData = { ...temp_data, ...formData }; // Use a different variable name
+                    // Transform mergedData keys based on formRules
+                    const transformedData = {};
+                    for (const key in mergedData) {
+                      const rule = formRules.find(rule => rule.input_id === key);
+                      if (rule) {
+                        transformedData[rule.standardized_field_name] = mergedData[key];
+                      } else {
+                        transformedData[key] = mergedData[key]; // Keep the original key if no rule is found
+                      }
+                    }
+            
+                    console.log(`Transformed data: ${JSON.stringify(transformedData)}`);
+            
+                    // Save transformed data to chrome storage
+                    await chrome.storage.local.set({ ['chubbFormData']: transformedData });
+                    chrome.runtime.sendMessage({ action: "saveFormData", data: transformedData }, response => {
+                      console.log('Data saved:', response);
+                    });
+                  } else {
+                    console.error('Error fetching form rules:', response);
+                  }
+                });
               });
               // Set the existing quote id
-              formData['quote_id'] = data[0].quote_id;
-              console.log('setting existing quote id', formData['quote_id']);
+              // formData['quote_id'] = data[0].quote_id;
+              // console.log('setting existing quote id', formData['quote_id']);
 
               // Log the updated quote_id
               // console.log('after set', formData['quote_id']);
@@ -93,51 +140,7 @@ if (window.location.href.includes('https://www.chubbsmallbusiness.com') || windo
             }
           });
           // Capture form data
-          inputs.forEach(input => {
-            // const formDataValue = {
-            //   value: input.value, // Existing value storage
-            //   type: input.type
-            // };
-            const formDataValue = input.value;
-    
-            if (input.type === 'radio') {
-              if (input.checked) {
-                formData[input.name] = formDataValue;
-              }
-            } else {
-              formData[input.name] = formDataValue;
-            }
-          });
-
-          let temp_data = await chrome.storage.local.get('temp_data') || {};
-          temp_data = temp_data['temp_data'] || {};
-          const mergedData = { ...temp_data, ...formData }; // Use a different variable name
-          chrome.runtime.sendMessage({ action: "getFormRules", data: "chubb" }, async response => {
-            if (response.status === 'success') {
-              const formRules = response.data;
-      
-              // Transform mergedData keys based on formRules
-              const transformedData = {};
-              for (const key in mergedData) {
-                const rule = formRules.find(rule => rule.input_id === key);
-                if (rule) {
-                  transformedData[rule.standardized_field_name] = mergedData[key];
-                } else {
-                  transformedData[key] = mergedData[key]; // Keep the original key if no rule is found
-                }
-              }
-      
-              console.log(`Transformed data: ${JSON.stringify(transformedData)}`);
-      
-              // Save transformed data to chrome storage
-              await chrome.storage.local.set({ ['chubbFormData']: transformedData });
-              chrome.runtime.sendMessage({ action: "saveFormData", data: transformedData }, response => {
-                console.log('Data saved:', response);
-              });
-            } else {
-              console.error('Error fetching form rules:', response);
-            }
-          });
+          
 
         }
         else {

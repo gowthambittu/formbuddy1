@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
   <title>Form Buddy</title>
@@ -21,4 +21,108 @@
   <button id="clearButton">Clear</button>
   <script src="popup.js"></script>
 </body>
+</html> -->
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Form Buddy</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      width: 250px;
+    }
+
+    h1 {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #4a4a4a;
+    }
+
+    #businessDropdown {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #f9f9f9;
+      margin-bottom: 15px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    button#copyButton {
+      background-color: #4CAF50;
+      color: white;
+      margin-bottom: 10px;
+    }
+
+    button#copyButton:hover {
+      background-color: #45a049;
+    }
+
+    button#clearButton {
+      background-color: #f44336;
+      color: white;
+    }
+
+    button#clearButton:hover {
+      background-color: #d32f2f;
+    }
+
+    .status-message {
+      font-size: 14px;
+      color: #333;
+      margin-top: 10px;
+      text-align: center;
+      display: none; /* Hide by default */
+    }
+
+    /* Icon styling for buttons */
+    .button-icon {
+      width: 16px;
+      height: 16px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+  <h1>Select Business</h1>
+  <select id="businessDropdown">
+    <option value="" disabled selected>Select a business</option>
+    <!-- Dynamic options added by JS -->
+  </select>
+
+  <button id="copyButton">
+    <img src="images/copy-icon.svg" class="button-icon" alt="Copy Icon"> Paste
+  </button>
+
+  <button id="clearButton">
+    <img src="images/clear-icon.svg" class="button-icon" alt="Clear Icon"> Clear
+  </button>
+
+  <div class="status-message" id="statusMessage">Action completed!</div>
+
+  <script src="popup.js"></script>
+</body>
 </html>
+

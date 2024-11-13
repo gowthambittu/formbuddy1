@@ -97,7 +97,7 @@ if (window.location.href.includes('thehartford.com')) {
             if (heading) {
               const button = document.createElement("button");
               button.id = "fillFormDataButton";
-              button.textContent = "Fill Form Data";
+              button.textContent = "Auto Fill Form Data";
     
               const existingButton = document.querySelector("#fillFormDataButton");
     

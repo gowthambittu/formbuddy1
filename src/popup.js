@@ -68,6 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const selectedQuoteId = event.target.value;
       chrome.runtime.sendMessage({action:"getQuoteByID", data:selectedQuoteId},(response =>{
         console.log('quote fecthed',response);
+        showStatusMessage("Data fetched successfully!");
         quoteObject = response.data;
         chrome.storage.local.set({'formDatatobeFilled': quoteObject}, () => {
           console.log('quoteObject saved to Chrome local storage');
@@ -82,6 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
 document.getElementById('clearButton').addEventListener('click', () => {
   chrome.storage.local.remove('formDatatobeFilled', () => {
     console.log('formData removed from Chrome local storage');
+    showStatusMessage("Data cleared.");
   });
 });
 
@@ -129,6 +131,18 @@ function fillFormData(data) {
   }
 }
 
+// Function to display a status message temporarily
+function showStatusMessage(message) {
+  const statusMessage = document.getElementById("statusMessage");
+  statusMessage.textContent = message;
+  statusMessage.style.display = "block";
+  
+  // Hide the message after 2 seconds
+  setTimeout(() => {
+      statusMessage.style.display = "none";
+  }, 2000);
+}
+
   // Ensure the element with id 'copyButton' exists before adding the event listener
   const copyButton = document.getElementById("copyButton");
 if (copyButton) {
@@ -141,6 +155,7 @@ if (copyButton) {
           args: [quoteObject] // Pass quoteObject to the executed script
         });
       });
+      
     } else {
       console.error("No quote object available. Please select a quote from the dropdown first.");
     }

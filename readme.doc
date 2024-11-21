@@ -1,0 +1,19 @@
+Steps to load the extension into folder
+1.	import the project into any IDE e.g Visual Studio code.
+2.	Install node pack manager if you don't have it (npm)
+3.	Commands to run in terminal :
+o	npm install
+o	npm webpack
+4.	Once above two commands are executed successfully, you will see ‘node_modules’ and ‘dist’ folder being created into the current folder.
+5.	Go to chrome://extensions
+6.	Enable developer mode to the top right corner of the window.
+7.	Click on 'load unpacked' button
+8.	Navigate to the form-copier extension folder in your computer 
+9.	select 'dist' folder 
+10.	After above steps are completed you will see the below extension loaded into chrome browser.
+
+ 
+Currently this extension is whitelisted for two carriers
+
+-	Hartford
+-	chubb

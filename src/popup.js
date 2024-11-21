@@ -85,6 +85,11 @@ document.getElementById('clearButton').addEventListener('click', () => {
     console.log('formData removed from Chrome local storage');
     showStatusMessage("Data cleared.");
   });
+   // Clear the current selection of the dropdown
+   const businessDropdown = document.getElementById('businessDropdown');
+   if (businessDropdown) {
+     businessDropdown.value = '';
+   }
 });
 
  // Function to simulate typing into an input element
